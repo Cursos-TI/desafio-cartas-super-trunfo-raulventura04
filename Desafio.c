@@ -1,80 +1,107 @@
-#include <stdio.h>
+#include <stdio.h>  
+#include <string.h>  
 
-typedef struct {
-    char estado;
-    char codigo[10];
-    char nomeCidade[50];
-    int populacao;
-    float area;
-    float pib;
-    int pontosTuristicos;
-} Cidade;
+typedef struct {  
+    char estado[50];  
+    char codigo[20];  
+    char nome[50];  
+    int populacao;  
+    float area;  
+    float pib;  
+    int pontos_turisticos;  
+} Carta;  
 
-void gerarCodigoCidade(char estado, char* codigo) {
-    static int contador[26] = {0}; // Para 26 estados possíveis
+float densidade_populacional(Carta carta) {  
+    return carta.populacao / carta.area;  
+}  
 
-    int indice = estado - 'A'; // Assume que estados são letras de A a Z
+void cadastrar_carta(Carta *carta) {  
+    printf("Digite o estado: ");  
+    scanf("%s", carta->estado);  
+    
+    printf("Digite o codigo da carta: ");  
+    scanf("%s", carta->codigo);  
+    
+    printf("Digite o nome da cidade: ");  
+    scanf("%s", carta->nome);  
+    
+    printf("Digite a populacao: ");  
+    scanf("%d", &carta->populacao);  
+    
+    printf("Digite a area (em km²): ");  
+    scanf("%f", &carta->area);  
+    
+    printf("Digite o PIB (em milhoes de dolares): ");  
+    scanf("%f", &carta->pib);  
+    
+    printf("Digite o numero de pontos turisticos: ");  
+    scanf("%d", &carta->pontos_turisticos);  
+}  
 
-    if (contador[indice] < 4) {
-        contador[indice]++;
-        sprintf(codigo, "%c%02d", estado, contador[indice]);
-    } else {
-        printf("Erro: Estado %c já tem 4 cidades cadastradas.\n", estado);
-    }
-}
+void comparar_cartas(Carta carta1, Carta carta2, char *atributo) {  
+    if (strcmp(atributo, "populacao") == 0) {  
+        if (carta1.populacao > carta2.populacao) {  
+            printf("A cidade %s venceu com populacao de %d.\n", carta1.nome, carta1.populacao);  
+        } else if (carta1.populacao < carta2.populacao) {  
+            printf("A cidade %s venceu com populacao de %d.\n", carta2.nome, carta2.populacao);  
+        } else {  
+            printf("As populacoes sao iguais.\n");  
+        }  
 
-void gerarCodigoCidade(char estado, char* codigo) {
-    static int contador[26] = {0}; // Para 26 estados possíveis
+    } else if (strcmp(atributo, "area") == 0) {  
+        if (carta1.area > carta2.area) {  
+            printf("A cidade %s venceu com area de %.2f km².\n", carta1.nome, carta1.area);  
+        } else if (carta1.area < carta2.area) {  
+            printf("A cidade %s venceu com area de %.2f km².\n", carta2.nome, carta2.area);  
+        } else {  
+            printf("As areas sao iguais.\n");  
+        }  
 
-    int indice = estado - 'A'; // Assume que estados são letras de A a Z
+    } else if (strcmp(atributo, "pib") == 0) {  
+        if (carta1.pib > carta2.pib) {  
+            printf("A cidade %s venceu com PIB de %.2f milhoes.\n", carta1.nome, carta1.pib);  
+        } else if (carta1.pib < carta2.pib) {  
+            printf("A cidade %s venceu com PIB de %.2f milhoes.\n", carta2.nome, carta2.pib);  
+        } else {  
+            printf("Os PIBs sao iguais.\n");  
+        }  
 
-    if (contador[indice] < 4) {
-        contador[indice]++;
-        sprintf(codigo, "%c%02d", estado, contador[indice]);
-    } else {
-        printf("Erro: Estado %c já tem 4 cidades cadastradas.\n", estado);
-    }
-}
+    } else if (strcmp(atributo, "densidade") == 0) {  
+        float densidade1 = densidade_populacional(carta1);  
+        float densidade2 = densidade_populacional(carta2);  
+        if (densidade1 < densidade2) {  
+            printf("A cidade %s venceu com densidade populacional de %.2f habitantes/km².\n", carta1.nome, densidade1);  
+        } else if (densidade1 > densidade2) {  
+            printf("A cidade %s venceu com densidade populacional de %.2f habitantes/km².\n", carta2.nome, densidade2);  
+        } else {  
+            printf("As densidades populacionais sao iguais.\n");  
+        }  
 
-void cadastrarCidade(Cidade *cidade) {
-    printf("Digite o estado (1 caractere): ");
-    scanf(" %c", &cidade->estado);
-    getchar(); // Consumir o caractere de nova linha
+    } else {  
+        printf("Atributo invalido.\n");  
+    }  
+}  
 
-    printf("Digite o nome da cidade: ");
-    fgets(cidade->nomeCidade, sizeof(cidade->nomeCidade), stdin);
+int main() {  
+    Carta carta1, carta2;  
 
-    printf("Digite a população: ");
-    scanf("%d", &cidade->populacao);
+    printf("Cadastro da primeira carta...\n");  
+    cadastrar_carta(&carta1);  
 
-    printf("Digite a área em km²: ");
-    scanf("%f", &cidade->area);
+    printf("\nCadastro da segunda carta...\n");  
+    cadastrar_carta(&carta2);  
 
-    printf("Digite o PIB: ");
-    scanf("%f", &cidade->pib);
+    printf("\nSobre as cartas cadastradas:\n");  
+    printf("Carta 1: %s - Populacao: %d, Area: %.2f, PIB: %.2f, Densidade: %.2f habitantes/km²\n",   
+           carta1.nome, carta1.populacao, carta1.area, carta1.pib, densidade_populacional(carta1));  
+    printf("Carta 2: %s - Populacao: %d, Area: %.2f, PIB: %.2f, Densidade: %.2f habitantes/km²\n",   
+           carta2.nome, carta2.populacao, carta2.area, carta2.pib, densidade_populacional(carta2));  
 
-    printf("Digite o número de pontos turísticos: ");
-    scanf("%d", &cidade->pontosTuristicos);
-}
+    char atributo[20];  
+    printf("\nEscolha um atributo para comparar (populacao, area, pib, densidade): ");  
+    scanf("%s", atributo);  
 
-void exibirCidade(Cidade cidade) {
-    char codigo[10];
-    gerarCodigoCidade(cidade.estado, codigo);
+    comparar_cartas(carta1, carta2, atributo);  
 
-    printf("\n--- Dados da Cidade ---\n");
-    printf("Estado: %c\n", cidade.estado);
-    printf("Código: %s\n", codigo);
-    printf("Nome da Cidade: %s", cidade.nomeCidade);
-    printf("População: %d\n", cidade.populacao);
-    printf("Área: %.2f km²\n", cidade.area);
-    printf("PIB: %.2f bilhões de reais\n", cidade.pib);
-    printf("Número de Pontos Turísticos: %d\n", cidade.pontosTuristicos);
-}
-
-int main() {
-    Cidade cidade;
-    cadastrarCidade(&cidade);
-    exibirCidade(cidade);
-
-    return 0;
+    return 0;  
 }
